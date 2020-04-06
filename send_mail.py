@@ -20,7 +20,7 @@ def do_send(user_mail, plain_text):
     my_user = 'jingwei.shi@foxmail.com'  # 收件人邮箱账号，我这边发送给自己
     try:
         msg = MIMEText("用户电子邮箱："+user_mail+"\n"+plain_text, 'plain', 'utf-8')
-        msg['From'] = formataddr(["word killer", my_sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
+        msg['From'] = formataddr(["hello-word", my_sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
         msg['To'] = formataddr(["jingwei", my_user])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
         msg['Subject'] = "Word就是我的-用户反馈"  # 邮件的主题，也可以说是标题
         server = smtplib.SMTP_SSL("smtp.sina.com", 465)  # 发件人邮箱中的SMTP服务器，端口是25

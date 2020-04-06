@@ -8,8 +8,7 @@
 import os
 import time
 
-from PyQt5 import QtCore
-
+from PyQt5 import QtCore, QtGui
 import read_chapter_file as reader
 
 
@@ -36,3 +35,45 @@ class join_file_thread(QtCore.QThread):
             print("文件合成失败")
         # 大事干完了，发送一个信号告诉主线程窗口
         self.finishSignal.emit(["文件合成状态正常！您可以进行整书自测！"])
+
+
+class open_url_thread(QtCore.QThread):
+    """连接单词文件，组成全单词模式"""
+    # 声明一个信号，同时返回一个list，同理什么都能返回啦
+    finishSignal = QtCore.pyqtSignal(list)
+
+    # 构造函数里增加形参
+    def __init__(self, t, parent=None):
+        super(open_url_thread, self).__init__(parent)
+        self.t = t
+        # 储存参数
+
+    # 重写 run() 函数，在里面干大事。
+    def run(self):
+        try:
+            QtGui.QDesktopServices.openUrl(QtCore.QUrl(self.t))
+        except:
+            print("打开成功")
+        # 大事干完了，发送一个信号告诉主线程窗口
+        self.finishSignal.emit(["打开成功！"])
+
+class read_file_thread(QtCore.QThread):
+    """连接单词文件，组成全单词模式"""
+    # 声明一个信号，同时返回一个list，同理什么都能返回啦
+    finishSignal = QtCore.pyqtSignal(list)
+
+    # 构造函数里增加形参
+    def __init__(self, t, parent=None):
+        super(read_file_thread, self).__init__(parent)
+        self.t = t
+        # 储存参数
+
+    # 重写 run() 函数，在里面干大事。
+    def run(self):
+        try:
+            self.words, self.chinese, self.wrong_words_line = reader.read_chapter_file_by_chapter(self.t)
+            return self.words, self.chinese, self.wrong_words_line
+        except:
+            print("文件读取失败")
+        # 大事干完了，发送一个信号告诉主线程窗口
+        self.finishSignal.emit(["文件读取状态正常！您可以进行整书自测！"])

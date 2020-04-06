@@ -23,7 +23,7 @@ def read_chapter_file_by_chapter(file_id):
     # 储存所有行的列表
     wrong_words_line = []
     # 打开相应文件
-    file = open("./" + classify + "/" + name + ".txt", "r", encoding="utf-8")
+    file = open(classify + "/" + name + ".txt", "r", encoding="utf-8")
     # 读入文本第一行
     line = file.readline()
     # 循环读行 跳过空行
@@ -79,14 +79,14 @@ def handle_file_dir(file_id):
     dir_head = file_id.split("_")[0]
     wrong_dir = dir_head + "wrong"
     wrong_file_name = wrong_dir + ".txt"
-    wrong_dir_file = "./" + wrong_dir + "/" + wrong_file_name
+    wrong_dir_file = wrong_dir + "/" + wrong_file_name
     return wrong_dir_file, wrong_dir
 
 
 def delete_from_file(file_id, chosen_line):
     file_id = file_id.strip()
     classify, name = file_id.split("_")
-    wrong_dir_file = "./" + classify + "/" + name + ".txt"
+    wrong_dir_file = classify + "/" + name + ".txt"
     check_wrong_file = open(wrong_dir_file, "r", encoding="utf-8")
     line = check_wrong_file.readline()
     lines = []
@@ -108,8 +108,8 @@ def join_each_file(dir_dictionary, mode):
     dir_now_num = 0
     for key in dir_dictionary:
         dir_now_num += 1
-        now_dir = "./" + dir_dictionary[key] + "/"
-        now_file_dir = "./" + now_dir + "/all.txt"
+        now_dir = dir_dictionary[key] + "/"
+        now_file_dir = now_dir + "/all.txt"
         file_num = len(os.listdir(now_dir))
         dir_num = len(dir_dictionary)
         if file_num == 0:

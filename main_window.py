@@ -7,6 +7,7 @@
 # @Blog    ：https://www.cnblogs.com/Jewish/
 
 import random
+import threading
 from decimal import Decimal
 
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
@@ -16,10 +17,11 @@ from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import QLabel, QScrollArea, QWidget, QPushButton, QVBoxLayout, QInputDialog, QLineEdit, QMessageBox
 import read_chapter_file as reader
 import os
+from join_file_thread import join_file_thread, open_url_thread, read_file_thread
+import send_mail
 
 
 # 声明主窗口类
-import send_mail
 
 
 class MainUi(QtWidgets.QMainWindow):
@@ -171,7 +173,7 @@ class MainUi(QtWidgets.QMainWindow):
                 border-right:1px solid darkGray;
                 border-top-right-radius:10px;
                 border-bottom-right-radius:10px;
-                border-image: url('./images/welcome.jpg');
+                border-image: url('images/welcome.jpg');
             }
         ''')
         self.left_close.setFixedSize(15, 15)  # 设置关闭按钮的大小
@@ -214,11 +216,11 @@ class MainUi(QtWidgets.QMainWindow):
 
         # 设置单词自测部分跳转对应页面的按钮监听
         self.left_button_1.clicked.connect(
-            lambda: self.word_page("新东方四级词汇（乱序版）", 35, './images/cet4.png', "cet4_", self.left_button_1.text()))
+            lambda: self.word_page("新东方四级词汇（乱序版）", 35, 'images/cet4.png', "cet4_", self.left_button_1.text()))
         self.left_button_2.clicked.connect(
-            lambda: self.word_page("新东方六级词汇（乱序版）", 30, './images/cet6.png', "cet6_", self.left_button_2.text()))
+            lambda: self.word_page("新东方六级词汇（乱序版）", 30, 'images/cet6.png', "cet6_", self.left_button_2.text()))
         self.left_button_3.clicked.connect(
-            lambda: self.word_page("新东方考研词汇（正序版）", 50, './images/study.png', "study_", self.left_button_3.text()))
+            lambda: self.word_page("新东方考研词汇（正序版）", 50, 'images/study.png', "study_", self.left_button_3.text()))
 
         self.left_button_4.clicked.connect(lambda: self.wrong_handle("cet4_wrong"))
         self.left_button_5.clicked.connect(lambda: self.wrong_handle("cet6_wrong"))
@@ -228,7 +230,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.left_button_8.clicked.connect(self.open_about)
 
     def open_about(self):
-        print(os.popen(".\\AboutSoftware\\index.html"))
+        threading.Thread(target=os.system, args=("AboutSoftware\\index.html",)).start()
 
     # 以下三个函数设置拖动窗口
     def mousePressEvent(self, QMouseEvent):
@@ -273,7 +275,7 @@ class MainUi(QtWidgets.QMainWindow):
         # 第二本书籍
         self.recommend_button_2 = QtWidgets.QToolButton()
         self.recommend_button_2.setText("更多词汇书籍敬请期待……")
-        self.recommend_button_2.setIcon(QtGui.QIcon('./images/soon.png'))
+        self.recommend_button_2.setIcon(QtGui.QIcon('images/soon.png'))
         self.recommend_button_2.setIconSize(QtCore.QSize(100, 100))
         self.recommend_button_2.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
@@ -326,25 +328,25 @@ class MainUi(QtWidgets.QMainWindow):
 
         self.playlist_button_1 = QtWidgets.QToolButton()
         self.playlist_button_1.setText("整书自测")
-        self.playlist_button_1.setIcon(QtGui.QIcon('./images/book.png'))
+        self.playlist_button_1.setIcon(QtGui.QIcon('images/book.png'))
         self.playlist_button_1.setIconSize(QtCore.QSize(100, 100))
         self.playlist_button_1.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
         self.playlist_button_2 = QtWidgets.QToolButton()
         self.playlist_button_2.setText("继续上次(仅限整书自测）")
-        self.playlist_button_2.setIcon(QtGui.QIcon('./images/fight.png'))
+        self.playlist_button_2.setIcon(QtGui.QIcon('images/fight.png'))
         self.playlist_button_2.setIconSize(QtCore.QSize(100, 100))
         self.playlist_button_2.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
         self.playlist_button_3 = QtWidgets.QToolButton()
         self.playlist_button_3.setText("单元自测请点击目录中按钮")
-        self.playlist_button_3.setIcon(QtGui.QIcon('./images/unit.png'))
+        self.playlist_button_3.setIcon(QtGui.QIcon('images/unit.png'))
         self.playlist_button_3.setIconSize(QtCore.QSize(100, 100))
         self.playlist_button_3.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
         self.playlist_button_4 = QtWidgets.QToolButton()
         self.playlist_button_4.setText("退出")
-        self.playlist_button_4.setIcon(QtGui.QIcon('./images/exit.png'))
+        self.playlist_button_4.setIcon(QtGui.QIcon('images/exit.png'))
         self.playlist_button_4.setIconSize(QtCore.QSize(100, 100))
         self.playlist_button_4.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
@@ -438,7 +440,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.process_info_label1.setObjectName('word_button')
         self.process_info_label2 = QtWidgets.QPushButton(qtawesome.icon('fa.remove', color='#fa5a5a'), "")
         self.process_info_label2.setObjectName('word_button')
-        self.process_info_label3 = QtWidgets.QPushButton(qtawesome.icon('fa.hourglass-half', color='grey'),
+        self.process_info_label3 = QtWidgets.QPushButton(qtawesome.icon('fa.refresh', color='grey'),
                                                          str(self.already) + "%\t")
         self.process_info_label3.setObjectName('word_button')
         self.process_info_label4 = QtWidgets.QPushButton(qtawesome.icon('fa.search', color='#cb99c5'),
@@ -642,8 +644,6 @@ class MainUi(QtWidgets.QMainWindow):
         # 把按钮禁用掉
         self.playlist_button_1.setDisabled(True)
         self.playlist_button_2.setDisabled(True)
-        # import 自己的进程类
-        from join_file_thread import join_file_thread
         # 新建对象，传入参数
         self.bwThread = join_file_thread("init")
         # 连接子进程的信号和槽函数
@@ -701,11 +701,12 @@ class MainUi(QtWidgets.QMainWindow):
         if self.is_file_change == True:
             self.is_file_change = False
             try:
-                self.words, self.chinese, self.wrong_words_line = reader.read_chapter_file_by_chapter(class_id)
+                thread = read_file_thread(class_id)
+                self.words, self.chinese, self.wrong_words_line = thread.run()
                 file_id = class_id.strip()
                 # 分开目录以及文件名称
                 classify, name = file_id.split("_")
-                class_id = "./" + classify + "/" + name + ".txt"
+                class_id = classify + "/" + name + ".txt"
                 self.terminal_line_2 = self.terminal_line_3
                 self.terminal_line_3 = "读取文件成功：" + os.path.abspath(class_id)
                 self.show_terminal()
@@ -877,6 +878,7 @@ class MainUi(QtWidgets.QMainWindow):
     def send_mail_to_me(self):
         self.clean_right_layout()
         self.back_to_right_original_label()
+        self.enter_use = False
 
         self.email_widget = QtWidgets.QWidget()
         self.email_layout = QtWidgets.QVBoxLayout()
@@ -891,7 +893,9 @@ class MainUi(QtWidgets.QMainWindow):
 
         self.contact_string = QtWidgets.QLabel('''首先，欢迎您支持本软件，在使用过程中如有bug反馈、寻求合作等问题欢迎您联系我！
                                                \n看到后将第一时间回复！软件为个人开发，仅作为免费开源的学习工具分享，不会用于
-                                               \n商业用途，还请大家正规使用。谢谢大家的配合！
+                                               \n商业用途，还请大家正规使用。谢谢大家的配合！也请大家大家关注我的个人公众号，
+                                               \n会得到更多学习工具、大学课程学习内容、大作业等内容，如果想要支持苦逼的我，
+                                               \n觉得文章工具不错的话，也可以进行打赏，不过不要花钱买这些免费的工具噢！
                                                ''')
         self.contact_string.setObjectName("more")
 
@@ -900,7 +904,7 @@ class MainUi(QtWidgets.QMainWindow):
 
         self.claim_string = QtWidgets.QLabel("软件为个人享有著作权，但是免费开源分享给大家，还请大家勿用于商业行为，如果"
                                              "\n您消费得到此软件请告知于我。除此之外，软件中单词文本为个人参照手中单词书录"
-                                             "\n入，如果您认为依旧侵权，也请联系，会与您及时友善地协商解决问题。\n")
+                                             "\n入，如果您认为依旧侵权，也请联系，会与您及时友善地协商解决问题。")
 
         self.email_label_1 = QtWidgets.QLabel("火狐邮箱：jingwei.shi@foxmail.com")
         self.email_label_1.setObjectName("contact")
@@ -912,7 +916,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.wechat_label.setObjectName("contact")
 
         self.wechat_code = QtWidgets.QLabel()
-        wechat_jpg = QtGui.QPixmap("./images/wechat.jpg")
+        wechat_jpg = QtGui.QPixmap("images/wechat.jpg")
         self.wechat_code.setPixmap(wechat_jpg)
 
         self.send_label = QtWidgets.QLabel('向我发送消息')
@@ -950,7 +954,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.district = QtWidgets.QLabel("所属地区：浦东 上海 中国\n\n")
         self.district.setObjectName("contact")
 
-        self.website = QtWidgets.QPushButton(qtawesome.icon("fa.edge", color="#463B34"), "官网链接：http://m250g10468.qicp"
+        self.website = QtWidgets.QPushButton(qtawesome.icon("fa.link", color="#463B34"), "官网链接：http://m250g10468.qicp"
                                                                                          ".vip\n/wordkiller/index.html "
                                                                                          "\n(如若失效请点击关于软件打开本地网页）")
         self.website.setIconSize(QtCore.QSize(30, 30))
@@ -961,7 +965,8 @@ class MainUi(QtWidgets.QMainWindow):
         self.send_button = QtWidgets.QPushButton(qtawesome.icon("fa.paper-plane", color="white"), "\n发送\n")
         self.send_button.setObjectName("loginBtn")
 
-        self.version_code = QtWidgets.QPushButton(qtawesome.icon("fa.copyright"), "史经伟. All rights reserved. 当前版本号：0.1.0")
+        self.version_code = QtWidgets.QPushButton(qtawesome.icon("fa.copyright"),
+                                                  "史经伟. All rights reserved. 当前版本号：0.1.0.200406_alpha")
         self.setObjectName("version")
         self.version_code.setIconSize(QtCore.QSize(20, 20))
 
@@ -1072,12 +1077,12 @@ class MainUi(QtWidgets.QMainWindow):
             ''')
 
         self.send_button.clicked.connect(self.send_mail)
-        self.website_git.clicked.connect(self.git_link)
-        self.website.clicked.connect(self.web_link)
+        self.website_git.clicked.connect(lambda: self.web_site_thread('https://github.com/jingwei1205'))
+        self.website.clicked.connect(lambda: self.web_site_thread('http://m250g10468.qicp.vip/wordkiller/index.html'))
 
     def send_mail(self):
         self.send_button.setText("发送中……请稍等……")
-        if self.input_mail.text()=="" or self.input_content.toPlainText()=="":
+        if self.input_mail.text() == "" or self.input_content.toPlainText() == "":
             QMessageBox.warning(self, '提示', '您好,您的邮箱、发送信息不能为空噢！', QMessageBox.Yes)
             self.send_button.setText("\n发送\n")
             return
@@ -1088,11 +1093,9 @@ class MainUi(QtWidgets.QMainWindow):
             QMessageBox.warning(self, '好像出问题了', '发送失败,可能原因为网络连接或服务器失效！', QMessageBox.Yes)
             self.send_button.setText("\n发送\n")
 
-    def git_link(self):
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl('https://github.com/jingwei1205'))
-
-    def web_link(self):
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://m250g10468.qicp.vip/wordkiller/index.html'))
+    def web_site_thread(self, t):
+        thread = open_url_thread(t)
+        thread.run()
 
 
 def main():

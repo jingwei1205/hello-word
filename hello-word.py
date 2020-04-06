@@ -460,7 +460,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.left_button_8.clicked.connect(self.open_about)
 
     def open_about(self):
-        threading.Thread(target=os.system, args=("AboutSoftware\index.html",)).start()
+        threading.Thread(target=os.system, args=("AboutSoftware\\index.html",)).start()
 
     # 以下三个函数设置拖动窗口
     def mousePressEvent(self, QMouseEvent):
@@ -1109,6 +1109,8 @@ class MainUi(QtWidgets.QMainWindow):
     def send_mail_to_me(self):
         self.clean_right_layout()
         self.back_to_right_original_label()
+
+        self.enter_use = False
 
         self.email_widget = QtWidgets.QWidget()
         self.email_layout = QtWidgets.QVBoxLayout()
