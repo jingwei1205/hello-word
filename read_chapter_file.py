@@ -7,6 +7,7 @@
 # @Software: PyCharm
 
 import os
+import string
 
 
 def read_chapter_file_by_chapter(file_id):
@@ -116,7 +117,8 @@ def join_each_file(dir_dictionary, mode):
             continue
         if mode == "init":
             if os.path.exists(now_file_dir):
-                return
+                global check_file
+                check_file = "exist"
             else:
                 write_in_all(now_file_dir, now_dir, file_now_num, file_num)
         if mode == "redone":
@@ -140,6 +142,7 @@ def write_in_all(now_file_dir, now_dir, file_now_num, file_num):
         opened_file.close()
     all_file.close()
 
+
 # 装饰者模式实现静态变量的方法
 # def static_vars(**kwargs):
 #     def decorate(func):
@@ -155,3 +158,31 @@ def write_in_all(now_file_dir, now_dir, file_now_num, file_num):
 #         return foo.line2, foo.line3
 #     foo.line2 = line2
 #     foo.line3 = line3
+
+def write_log(mode, class_id, rest_list):
+    if not os.path.exists("log"):
+        os.mkdir("log")
+    rest_string = ""
+    for rest in rest_list:
+        rest_string += str(rest) + "@"
+    print(mode)
+    print(class_id)
+    file = open("log/" + class_id.split("_")[0] + mode + ".txt", "w", encoding="utf-8")
+    file.write(rest_string)
+    file.close()
+
+
+def read_log(mode, class_id):
+    print("log/" + class_id + mode + ".txt")
+    file = open("log/" + class_id + mode + ".txt", "r", encoding="utf-8")
+    rest_list = file.read()
+    file.close()
+    rest_list = rest_list.split("@")
+    get_list = []
+    print(rest_list)
+    for rest in rest_list:
+        print(rest)
+        if rest == "":
+            continue
+        get_list.append(int(rest))
+    return get_list

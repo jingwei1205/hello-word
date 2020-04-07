@@ -61,3 +61,5 @@ accordingly@ad.因此，从而*相应地，照着（办）
 absent@a.（from）缺席的，不在场的*缺乏的*漫不经心的
 accordance@n.一致，符合
 acquire@vt.取得，获得；学到
+absurd@a.荒唐的
+absolute@a.绝对的，完全的

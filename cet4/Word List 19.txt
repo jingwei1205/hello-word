@@ -30,14 +30,14 @@ exchange@n./v.交换；交流；兑换
 pledge@n.保证，誓言*vt.保证，许诺
 emotion@n.情感，感情*激动
 harsh@n.严厉的*粗糙的
-saving@n.节省，节约@储蓄金，存款
+saving@n.节省，节约*储蓄金，存款
 reasonable@adj.通情达理的，讲道理的*合理的*（价钱）公道的*尚好的，过得去的
 trumpet@n.喇叭，小号*vt.大声宣告，鼓吹
 applause@n.鼓掌，掌声
 nonsense@n.胡说，废话*冒失（或轻浮）的行动
 fantasy@n.想象，幻想*想象的产物
 usage@n.使用；对待；惯用法
-finance@n.财政，金融*财源，财务情况@v.（为...）筹措资金
+finance@n.财政，金融*财源，财务情况*v.（为...）筹措资金
 exaggerate@v.夸大，夸张
 trunk@n.树干*大衣箱，皮箱*汽车后备箱*象鼻
 grocer@n.食品商，杂货商

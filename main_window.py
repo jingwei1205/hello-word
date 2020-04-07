@@ -80,6 +80,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.chosen_lines = ""
         # 当前是否为错词模式
         self.wrong_word_mode = False
+        self.global_words_mode = False
 
         # 设置主窗口固定大小
         self.setFixedSize(960, 700)
@@ -339,7 +340,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.playlist_button_2.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
         self.playlist_button_3 = QtWidgets.QToolButton()
-        self.playlist_button_3.setText("单元自测请点击目录中按钮")
+        self.playlist_button_3.setText("合成文件\n（建议单词变动时操作）")
         self.playlist_button_3.setIcon(QtGui.QIcon('images/unit.png'))
         self.playlist_button_3.setIconSize(QtCore.QSize(100, 100))
         self.playlist_button_3.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
@@ -349,6 +350,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.playlist_button_4.setIcon(QtGui.QIcon('images/exit.png'))
         self.playlist_button_4.setIconSize(QtCore.QSize(100, 100))
         self.playlist_button_4.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+
 
         # 按钮加入布局
         self.right_playlist_layout.addWidget(self.playlist_button_1, 0, 0)
@@ -367,7 +369,10 @@ class MainUi(QtWidgets.QMainWindow):
 
         # 设置按钮监听
         self.playlist_button_4.clicked.connect(self.init_ui)
-        self.playlist_button_1.clicked.connect(self.muti_thread)
+        self.playlist_button_2.clicked.connect(lambda: self.global_start(class_id))
+        # self.playlist_button_2.clicked.connect(lambda: self.global_start(class_id))
+        self.playlist_button_3.clicked.connect(lambda: self.muti_thread("redone"))
+        self.playlist_button_1.clicked.connect(lambda: self.start_chapter_show(class_id+"all", self.now_mode, self.playlist_button_3.text()))
 
         # 设置样式
         self.right_recommend_widget.setStyleSheet(
@@ -402,6 +407,10 @@ class MainUi(QtWidgets.QMainWindow):
     def clean_right_layout(self):
         for i in range(self.right_layout.count()):
             self.right_layout.itemAt(i).widget().deleteLater()
+
+    def global_start(self, class_id):
+        self.global_words_mode = True
+        self.start_chapter_show(class_id + "all", self.now_mode, self.playlist_button_1.text())
 
     # 章节单词页面
     def start_chapter_show(self, class_id, mode, button_name):
@@ -640,12 +649,12 @@ class MainUi(QtWidgets.QMainWindow):
                                            + self.terminal_line_2 + "\n后台行 2："
                                            + self.terminal_line_3)
 
-    def muti_thread(self):
+    def muti_thread(self, mode):
         # 把按钮禁用掉
         self.playlist_button_1.setDisabled(True)
         self.playlist_button_2.setDisabled(True)
         # 新建对象，传入参数
-        self.bwThread = join_file_thread("init")
+        self.bwThread = join_file_thread(mode)
         # 连接子进程的信号和槽函数
         self.bwThread.finishSignal.connect(self.muti_thread_end)
         self.terminal_line_2 = "文件合并中……"
@@ -653,6 +662,7 @@ class MainUi(QtWidgets.QMainWindow):
         self.show_terminal()
         # 开始执行 run() 函数里的内容
         self.bwThread.run()
+
 
     def muti_thread_end(self, ls):
         for word in ls:
@@ -663,6 +673,7 @@ class MainUi(QtWidgets.QMainWindow):
             self.show_terminal()
             # 恢复按钮
         self.playlist_button_1.setDisabled(False)
+
 
     def cte_mode(self):
         self.now_mode = "cn_to_en"
@@ -713,6 +724,16 @@ class MainUi(QtWidgets.QMainWindow):
             except:
                 QMessageBox.warning(self, '提示', '不好意思噢！文件打开失败！请检查程序完整性！', QMessageBox.Yes)
                 return
+            if not "all" in class_id:
+                self.global_words_mode =False
+            if self.global_words_mode:
+                print(self.random_num)
+                try:
+                    self.random_num =reader.read_log(self.now_mode, class_id.split("/")[0])
+                    self.random_len = len(self.words)
+                except:
+                    QMessageBox.warning(self, '提示', '不好意思噢！您好像没有存档！点击确认或者整书自测开始新存档！', QMessageBox.Yes)
+
         if len(self.random_num) == 0:
             self.random_num = list(range(0, len(self.words)))
             self.random_len = len(self.random_num)
@@ -723,6 +744,8 @@ class MainUi(QtWidgets.QMainWindow):
         for choice in chosenExplain:
             self.join_explain += choice + "\n"
         self.random_num.remove(chosenNum)
+        if len(self.words)>100:
+            threading.Thread(target=reader.write_log, args=(self.now_mode, class_id.split("/")[0], self.random_num)).start()
         self.changeLen = len(self.random_num)
         self.already = Decimal((self.random_len - self.changeLen) / self.random_len * 100).quantize(Decimal('0.00'))
         self.process_info_label3.setText(str(self.already) + "%\t\t")
@@ -894,17 +917,21 @@ class MainUi(QtWidgets.QMainWindow):
         self.contact_string = QtWidgets.QLabel('''首先，欢迎您支持本软件，在使用过程中如有bug反馈、寻求合作等问题欢迎您联系我！
                                                \n看到后将第一时间回复！软件为个人开发，仅作为免费开源的学习工具分享，不会用于
                                                \n商业用途，还请大家正规使用。谢谢大家的配合！也请大家大家关注我的个人公众号，
-                                               \n会得到更多学习工具、大学课程学习内容、大作业等内容，如果想要支持苦逼的我，
-                                               \n觉得文章工具不错的话，也可以进行打赏，不过不要花钱买这些免费的工具噢！
+                                               \n会得到更多学习工具、大学课程学习内容、大作业等内容，如果觉得文章工具不错的
+                                               \n话，也可以进行打赏。
                                                ''')
         self.contact_string.setObjectName("more")
 
         self.claim_label = QtWidgets.QLabel("声明")
         self.claim_label.setObjectName("contact")
 
-        self.claim_string = QtWidgets.QLabel("软件为个人享有著作权，但是免费开源分享给大家，还请大家勿用于商业行为，如果"
-                                             "\n您消费得到此软件请告知于我。除此之外，软件中单词文本为个人参照手中单词书录"
-                                             "\n入，如果您认为依旧侵权，也请联系，会与您及时友善地协商解决问题。")
+        self.claim_string = QtWidgets.QLabel("声明：本软件为免费软件，本着服务同学，填补单词书以及背词软件不匹配需求漏洞，"
+                                             "\n不用于任何商业用途，也希望大家仅仅传播给有需求的同学。本软件键入的单词本均"
+                                             "\n不涉及各个单词书的核心卖点部分，所以还是十分建议大家购买实体书配套背单词的，"
+                                             "\n如果能因为本软件增加某本单词书的销量（单词本部分可能会涉及到侵权部分），"
+                                             "\n这样如果涉及到侵权问题也方便与出版社协商。如果您是某本书的出版商，如果发现"
+                                             "\n有侵害贵司知识产权的地方也可以通过邮箱联系，我会积极与您配合解决问题。 "
+                                             )
 
         self.email_label_1 = QtWidgets.QLabel("火狐邮箱：jingwei.shi@foxmail.com")
         self.email_label_1.setObjectName("contact")
